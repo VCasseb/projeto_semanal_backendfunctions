@@ -1,12 +1,11 @@
 {
     "bindings": [
       {
-        "authLevel": "function", 
         "type": "httpTrigger", 
         "direction": "in", 
-        "name": "req", 
         "methods": ["get", "post"], 
-        "route": "consultarpedido"
+        "authLevel": "function", 
+        "name": "req"
       },
       {
         "type": "http", 
