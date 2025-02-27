@@ -1,9 +1,4 @@
 import logging
-import pyodbc
-import os
-import json
-import uuid
-from datetime import datetime
 import azure.functions as func
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
