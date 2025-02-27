@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ADMIN)
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 @app.route(route="http_trigger")
 def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
