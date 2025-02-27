@@ -6,11 +6,10 @@ import uuid
 from datetime import datetime
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Função consultarpedido iniciada.")
 
-@app.route(route="consultarpedido")
-def consultarpedido(req: func.HttpRequest) -> func.HttpResponse:
-    # String de conexão (substitua pelos seus dados)
+    # String de conexão
     conn_str = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
         "SERVER=tcp:serverprojetomensales.database.windows.net,1433;"
@@ -23,25 +22,27 @@ def consultarpedido(req: func.HttpRequest) -> func.HttpResponse:
     )
 
     try:
-        # Conecta ao banco de dados
+        logging.info("Conectando ao banco de dados...")
         conn = pyodbc.connect(conn_str)
         cursor = conn.cursor()
+        logging.info("Conexão bem-sucedida!")
 
-        # Executa uma consulta
+        logging.info("Executando consulta...")
         cursor.execute("SELECT * FROM Pedidos")
         rows = cursor.fetchall()
+        logging.info(f"Consulta retornou {len(rows)} registros.")
 
-        # Processa os resultados para um formato JSON
+        # Processa os resultados
         pedidos = []
         for row in rows:
             pedido = {
                 "id": row.id,
                 "cliente": row.cliente,
                 "email": row.email,
-                "itens": json.loads(row.itens),  # Converte a string JSON para um objeto Python
-                "total": float(row.total),  # Converte Decimal para float
+                "itens": json.loads(row.itens),
+                "total": float(row.total),
                 "status": row.status,
-                "data_criacao": row.data_criacao.isoformat(),  # Converte datetime para string
+                "data_criacao": row.data_criacao.isoformat(),
                 "data_atualizacao": row.data_atualizacao.isoformat()
             }
             pedidos.append(pedido)
@@ -52,13 +53,13 @@ def consultarpedido(req: func.HttpRequest) -> func.HttpResponse:
 
         # Retorna os pedidos em formato JSON
         return func.HttpResponse(
-            json.dumps(pedidos),  # Converte a lista de pedidos para JSON
+            json.dumps(pedidos),
             status_code=200,
-            mimetype="application/json"  # Define o tipo de conteúdo como JSON
+            mimetype="application/json"
         )
 
     except Exception as e:
-        # Retorna uma mensagem de erro em formato JSON
+        logging.error(f"Erro na função consultarpedido: {str(e)}")
         return func.HttpResponse(
             json.dumps({"error": str(e)}),
             status_code=500,
