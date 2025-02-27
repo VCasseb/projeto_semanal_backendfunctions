@@ -6,9 +6,9 @@ import uuid
 from datetime import datetime
 import azure.functions as func
 
-app = func.FunctionApp()
+app = func.FunctionApp(http_auth_level=func.AuthLevel.ADMIN)
 
-@app.route(route="http_trigger", auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="http_trigger")
 def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
@@ -29,7 +29,7 @@ def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
              status_code=200
         )
 
-@app.route(route="consultarpedido", auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="consultarpedido")
 def consultarpedido(req: func.HttpRequest) -> func.HttpResponse:
     # String de conexão (substitua pelos seus dados)
     conn_str = (
@@ -65,7 +65,7 @@ def consultarpedido(req: func.HttpRequest) -> func.HttpResponse:
         return f"Erro: {str(e)}"
     
 
-@app.route(route="inserirpedido", auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="inserirpedido")
 def inserirpedido(req: func.HttpRequest) -> func.HttpResponse:
     try:
         # Obtém os dados do corpo da requisição
@@ -119,7 +119,7 @@ def inserirpedido(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(f"Erro ao inserir pedido: {str(e)}", status_code=500)
 
 
-@app.route(route="consultarumpedido", auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="consultarumpedido")
 def consultarumpedido(req: func.HttpRequest) -> func.HttpResponse:
     try:
         pedido_id = req.params.get("id")
@@ -171,7 +171,7 @@ def consultarumpedido(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         return func.HttpResponse(f"Erro ao obter pedido: {str(e)}", status_code=500)
 
-@app.route(route="atualizarstatus", auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="atualizarstatus")
 def atualizarstatus(req: func.HttpRequest) -> func.HttpResponse:
     try:
         req_body = req.get_json()
@@ -215,7 +215,7 @@ def atualizarstatus(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(f"Erro ao atualizar status do pedido: {str(e)}", status_code=500)
 
 
-@app.route(route="deletarpedido", auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="deletarpedido")
 def deletarpedido(req: func.HttpRequest) -> func.HttpResponse:
     try:
         pedido_id = req.params.get("id")
