@@ -3,16 +3,17 @@ import pymssql
 import json
 from datetime import datetime
 import azure.functions as func
-
+import uuid  # Import necessário para verificar UUIDs
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Função consultarpedido iniciada.")
 
     # Configuração de conexão com pymssql
-    server = "serverprojetomensales.database.windows.net"
-    database = "projetomensalesdatabase"
+    server = "serversqldatabasesemanal.database.windows.net"
+    database = "databasesqlsemanal"
     username = "vccasseb"
     password = "Lala3500@99"
+
 
     try:
         logging.info("Conectando ao banco de dados...")
@@ -25,17 +26,21 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         rows = cursor.fetchall()
         logging.info(f"Consulta retornou {len(rows)} registros.")
 
+        
+        for row in rows:
+            print("Linha retornada",rows)
+
         # Processa os resultados
         pedidos = [
             {
-                "id": row["id"],
-                "cliente": row["cliente"],
-                "email": row["email"],
-                "itens": json.loads(row["itens"]),
-                "total": float(row["total"]),
-                "status": row["status"],
-                "data_criacao": row["data_criacao"].isoformat(),
-                "data_atualizacao": row["data_atualizacao"].isoformat()
+                "Id": str(row["Id"]) if isinstance(row["Id"], uuid.UUID) else row["Id"],  # Converte UUID para string
+                "Cliente": row["Cliente"],
+                "Email": row["Email"],
+                "Itens": json.loads(row["Itens"]),
+                "Total": float(row["Total"]),
+                "Status": row["Status"],
+                "DataCriacao": row["DataCriacao"].isoformat(),
+                "DataAtualiza": row["DataAtualiza"].isoformat()
             }
             for row in rows
         ]
