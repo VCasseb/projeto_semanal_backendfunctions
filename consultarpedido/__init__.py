@@ -57,7 +57,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         )
 
     except Exception as e:
-        logging.error(f"Erro na função consultarpedido: {str(e)}")
+        logging.error("Erro na função consultarpedido", exc_info=True)  # Captura traceback completo
         return func.HttpResponse(
             json.dumps({"error": str(e)}),
             status_code=500,
