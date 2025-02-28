@@ -4,7 +4,6 @@ import json
 from datetime import datetime
 import azure.functions as func
 
-#xerequinha
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Função consultarpedido iniciada.")
