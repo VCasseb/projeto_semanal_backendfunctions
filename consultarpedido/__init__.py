@@ -1,28 +1,24 @@
 import logging
-import pyodbc
+import pymssql
 import json
 from datetime import datetime
 import azure.functions as func
 
+#xerequinha
+
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Função consultarpedido iniciada.")
 
-    # String de conexão
-    conn_str = (
-        "DRIVER={ODBC Driver 18 for SQL Server};"
-        "SERVER=tcp:serverprojetomensales.database.windows.net,1433;"
-        "DATABASE=projetomensalesdatabase;"
-        "UID=vccasseb;"
-        "PWD=Lala3500@99;"
-        "Encrypt=yes;"
-        "TrustServerCertificate=no;"
-        "Connection Timeout=30;"
-    )
+    # Configuração de conexão com pymssql
+    server = "serverprojetomensales.database.windows.net"
+    database = "projetomensalesdatabase"
+    username = "vccasseb"
+    password = "Lala3500@99"
 
     try:
         logging.info("Conectando ao banco de dados...")
-        conn = pyodbc.connect(conn_str)
-        cursor = conn.cursor()
+        conn = pymssql.connect(server, username, password, database)
+        cursor = conn.cursor(as_dict=True)  # Retorna os resultados como dicionários
         logging.info("Conexão bem-sucedida!")
 
         logging.info("Executando consulta...")
@@ -31,19 +27,19 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         logging.info(f"Consulta retornou {len(rows)} registros.")
 
         # Processa os resultados
-        pedidos = []
-        for row in rows:
-            pedido = {
-                "id": row.id,
-                "cliente": row.cliente,
-                "email": row.email,
-                "itens": json.loads(row.itens),
-                "total": float(row.total),
-                "status": row.status,
-                "data_criacao": row.data_criacao.isoformat(),
-                "data_atualizacao": row.data_atualizacao.isoformat()
+        pedidos = [
+            {
+                "id": row["id"],
+                "cliente": row["cliente"],
+                "email": row["email"],
+                "itens": json.loads(row["itens"]),
+                "total": float(row["total"]),
+                "status": row["status"],
+                "data_criacao": row["data_criacao"].isoformat(),
+                "data_atualizacao": row["data_atualizacao"].isoformat()
             }
-            pedidos.append(pedido)
+            for row in rows
+        ]
 
         # Fecha a conexão
         cursor.close()
