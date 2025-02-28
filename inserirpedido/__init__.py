@@ -7,6 +7,7 @@ from datetime import datetime
 import azure.functions as func
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info("Função inserir pedidos iniciada.")
     try:
         # Obtém os dados do corpo da requisição
         req_body = req.get_json()
@@ -25,8 +26,8 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # String de conexão (substitua pelos seus dados)
         conn_str = (
             "DRIVER={ODBC Driver 18 for SQL Server};"
-            "SERVER=tcp:serverprojetomensales.database.windows.net,1433;"
-            "DATABASE=projetomensalesdatabase;"
+            "SERVER=tcp:serversqldatabasesemanal.database.windows.net,1433;"
+            "DATABASE=databasesqlsemanal;"
             "UID=vccasseb;"
             "PWD=Lala3500@99;"
             "Encrypt=yes;"
@@ -41,7 +42,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Insere o pedido na tabela
         cursor.execute(
             """
-            INSERT INTO Pedidos (id, cliente, email, itens, total, status, data_criacao, data_atualizacao) 
+            INSERT INTO Pedidos (id, cliente, email, itens, total, status, DataCriacao, DataAtualiza) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (pedido_id, cliente, email, itens, total, status, data_criacao, data_atualizacao)
