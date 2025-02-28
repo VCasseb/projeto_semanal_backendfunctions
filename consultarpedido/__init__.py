@@ -1,5 +1,5 @@
 import logging
-import pymssql
+import pyodbc
 import json
 from datetime import datetime
 import azure.functions as func
@@ -8,17 +8,20 @@ import uuid  # Import necessário para verificar UUIDs
 def main(req: func.HttpRequest) -> func.HttpResponse:
     logging.info("Função consultarpedido iniciada.")
 
-    # Configuração de conexão com pymssql
+    # Configuração de conexão com pyodbc
     server = "serversqldatabasesemanal.database.windows.net"
     database = "databasesqlsemanal"
     username = "vccasseb"
     password = "Lala3500@99"
+    driver = "{ODBC Driver 17 for SQL Server}"  # Certifique-se de que o driver está instalado
 
+    # String de conexão
+    connection_string = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}"
 
     try:
         logging.info("Conectando ao banco de dados...")
-        conn = pymssql.connect(server, username, password, database)
-        cursor = conn.cursor(as_dict=True)  # Retorna os resultados como dicionários
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
         logging.info("Conexão bem-sucedida!")
 
         logging.info("Executando consulta...")
@@ -26,24 +29,20 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         rows = cursor.fetchall()
         logging.info(f"Consulta retornou {len(rows)} registros.")
 
-        
-        for row in rows:
-            print("Linha retornada",rows)
-
         # Processa os resultados
-        pedidos = [
-            {
-                "Id": str(row["Id"]) if isinstance(row["Id"], uuid.UUID) else row["Id"],  # Converte UUID para string
-                "Cliente": row["Cliente"],
-                "Email": row["Email"],
-                "Itens": json.loads(row["Itens"]),
-                "Total": float(row["Total"]),
-                "Status": row["Status"],
-                "DataCriacao": row["DataCriacao"].isoformat(),
-                "DataAtualiza": row["DataAtualiza"].isoformat()
+        pedidos = []
+        for row in rows:
+            pedido = {
+                "Id": str(row.Id) if isinstance(row.Id, uuid.UUID) else row.Id,  # Converte UUID para string
+                "Cliente": row.Cliente,
+                "Email": row.Email,
+                "Itens": json.loads(row.Itens),
+                "Total": float(row.Total),
+                "Status": row.Status,
+                "DataCriacao": row.DataCriacao.isoformat(),
+                "DataAtualiza": row.DataAtualiza.isoformat()
             }
-            for row in rows
-        ]
+            pedidos.append(pedido)
 
         # Fecha a conexão
         cursor.close()
