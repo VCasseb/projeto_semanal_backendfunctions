@@ -13,7 +13,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     database = "databasesqlsemanal"
     username = "vccasseb"
     password = "Lala3500@99"
-    driver = "{ODBC Driver 17 for SQL Server}"  # Certifique-se de que o driver está instalado
+    driver = "ODBC Driver 18 for SQL Server"  # Certifique-se de que o driver está instalado
 
     # String de conexão
     connection_string = f"DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}"
